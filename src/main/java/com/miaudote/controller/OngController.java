@@ -1,7 +1,9 @@
 package com.miaudote.controller;
 
 import com.miaudote.model.Ong;
+import com.miaudote.model.Usuario;
 import com.miaudote.repository.OngRepository;
+import com.miaudote.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,26 +17,30 @@ public class OngController {
     @Autowired
     private OngRepository ongRepository;
 
-    // Criar ou atualizar ONG
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @PostMapping
     public Ong createOng(@RequestBody Ong ong) {
+        // Salvar os dados básicos na coleção usuarios
+        Usuario usuario = new Usuario(ong.getNome(), ong.getEmail(), ong.getSenha());
+        usuarioRepository.save(usuario);
+
+        // Salvar os dados completos na coleção ongs
         return ongRepository.save(ong);
     }
 
-    // Buscar todas as ONGs
     @GetMapping
     public List<Ong> getAllOngs() {
         return ongRepository.findAll();
     }
 
-    // Buscar ONG por ID
     @GetMapping("/{id}")
     public Ong getOngById(@PathVariable String id) {
         Optional<Ong> ong = ongRepository.findById(id);
-        return ong.orElse(null); // Retorna null se não encontrar
+        return ong.orElse(null);
     }
 
-    // Deletar ONG por ID
     @DeleteMapping("/{id}")
     public void deleteOng(@PathVariable String id) {
         ongRepository.deleteById(id);

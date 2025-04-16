@@ -1,7 +1,9 @@
 package com.miaudote.controller;
 
 import com.miaudote.model.Adotante;
+import com.miaudote.model.Usuario;
 import com.miaudote.repository.AdotanteRepository;
+import com.miaudote.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,26 +17,30 @@ public class AdotanteController {
     @Autowired
     private AdotanteRepository adotanteRepository;
 
-    // Criar ou atualizar adotante
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
     @PostMapping
     public Adotante createAdotante(@RequestBody Adotante adotante) {
+        // Salvar os dados básicos na coleção usuarios
+        Usuario usuario = new Usuario(adotante.getNome(), adotante.getEmail(), adotante.getSenha());
+        usuarioRepository.save(usuario);
+
+        // Salvar os dados completos na coleção adotantes
         return adotanteRepository.save(adotante);
     }
 
-    // Buscar todos os adotantes
     @GetMapping
     public List<Adotante> getAllAdotantes() {
         return adotanteRepository.findAll();
     }
 
-    // Buscar adotante por ID
     @GetMapping("/{id}")
     public Adotante getAdotanteById(@PathVariable String id) {
         Optional<Adotante> adotante = adotanteRepository.findById(id);
-        return adotante.orElse(null); // Retorna null se não encontrar
+        return adotante.orElse(null);
     }
 
-    // Deletar adotante por ID
     @DeleteMapping("/{id}")
     public void deleteAdotante(@PathVariable String id) {
         adotanteRepository.deleteById(id);
